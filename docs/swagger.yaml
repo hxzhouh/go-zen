@@ -1,0 +1,213 @@
+basePath: /
+definitions:
+  domain.Category:
+    properties:
+      id:
+        type: string
+      name:
+        type: string
+      summary:
+        type: string
+    type: object
+  domain.CreatePostRequest:
+    properties:
+      category:
+        $ref: '#/definitions/domain.Category'
+      content:
+        type: string
+      cover:
+        type: string
+      subTitle:
+        type: string
+      summary:
+        type: string
+      tag:
+        items:
+          $ref: '#/definitions/domain.Tag'
+        type: array
+      title:
+        type: string
+    required:
+    - content
+    - title
+    type: object
+  domain.CreatePostResponse:
+    properties:
+      id:
+        type: string
+    type: object
+  domain.LoginResponse:
+    properties:
+      accessToken:
+        type: string
+      refreshToken:
+        type: string
+    type: object
+  domain.Post:
+    properties:
+      authorID:
+        type: string
+      category:
+        $ref: '#/definitions/domain.Category'
+      content:
+        type: string
+      contentHtml:
+        type: string
+      cover:
+        type: string
+      draft:
+        type: boolean
+      id:
+        type: string
+      md5:
+        type: string
+      subTitle:
+        type: string
+      summary:
+        type: string
+      tags:
+        items:
+          $ref: '#/definitions/domain.Tag'
+        type: array
+      title:
+        type: string
+    type: object
+  domain.SignupResponse:
+    properties:
+      accessToken:
+        type: string
+      refreshToken:
+        type: string
+    type: object
+  domain.Tag:
+    properties:
+      id:
+        type: string
+      name:
+        type: string
+    type: object
+host: 127.0.0.1:8081
+info:
+  contact: {}
+  description: IvanApi Service
+  title: go_zen blog system API
+  version: "1.0"
+paths:
+  /login:
+    post:
+      consumes:
+      - application/json
+      description: 注册用户，
+      parameters:
+      - description: Request ID
+        in: header
+        name: request_id
+        required: true
+        type: string
+      - in: query
+        name: email
+        required: true
+        type: string
+      - in: query
+        name: password
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.LoginResponse'
+      summary: 用户登录接口
+      tags:
+      - 用户相关接口
+  /posts/:id:
+    get:
+      consumes:
+      - application/json
+      description: 根据id获取文章，如果为空返回错误
+      parameters:
+      - description: Request ID
+        in: header
+        name: request_id
+        required: true
+        type: string
+      - description: 文章id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.Post'
+      summary: 根据id获取文章
+      tags:
+      - 文章相关接口
+  /posts/create:
+    get:
+      consumes:
+      - application/json
+      description: 创建文章，返回文章Id
+      parameters:
+      - description: Request ID
+        in: header
+        name: request_id
+        required: true
+        type: string
+      - description: 创建文章的参数
+        in: body
+        name: post
+        required: true
+        schema:
+          $ref: '#/definitions/domain.CreatePostRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.CreatePostResponse'
+      security:
+      - Authorization: []
+      summary: 创建文章
+      tags:
+      - 文章相关接口
+  /signup:
+    post:
+      consumes:
+      - application/json
+      description: 注册用户，
+      parameters:
+      - description: Request ID
+        in: header
+        name: request_id
+        required: true
+        type: string
+      - in: query
+        name: email
+        required: true
+        type: string
+      - in: query
+        name: name
+        required: true
+        type: string
+      - in: query
+        name: password
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.SignupResponse'
+      summary: 注册用户
+      tags:
+      - 用户相关接口
+swagger: "2.0"
