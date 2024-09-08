@@ -1,18 +1,11 @@
 basePath: /
 definitions:
-  domain.Category:
-    properties:
-      id:
-        type: string
-      name:
-        type: string
-      summary:
-        type: string
-    type: object
   domain.CreatePostRequest:
     properties:
-      category:
-        $ref: '#/definitions/domain.Category'
+      category_ids:
+        items:
+          type: string
+        type: array
       content:
         type: string
       cover:
@@ -21,9 +14,9 @@ definitions:
         type: string
       summary:
         type: string
-      tag:
+      tag_ids:
         items:
-          $ref: '#/definitions/domain.Tag'
+          type: string
         type: array
       title:
         type: string
@@ -36,6 +29,30 @@ definitions:
       id:
         type: string
     type: object
+  domain.CreateTagRequest:
+    properties:
+      name:
+        type: string
+    required:
+    - name
+    type: object
+  domain.ListTagsResponse:
+    properties:
+      tags:
+        items:
+          $ref: '#/definitions/domain.Tag'
+        type: array
+    type: object
+  domain.LoginRequest:
+    properties:
+      password:
+        type: string
+      user:
+        type: string
+    required:
+    - password
+    - user
+    type: object
   domain.LoginResponse:
     properties:
       accessToken:
@@ -47,8 +64,10 @@ definitions:
     properties:
       authorID:
         type: string
-      category:
-        $ref: '#/definitions/domain.Category'
+      category_id:
+        items:
+          type: string
+        type: array
       content:
         type: string
       contentHtml:
@@ -61,13 +80,15 @@ definitions:
         type: string
       md5:
         type: string
+      postId:
+        type: string
       subTitle:
         type: string
       summary:
         type: string
-      tags:
+      tag_ids:
         items:
-          $ref: '#/definitions/domain.Tag'
+          type: string
         type: array
       title:
         type: string
@@ -84,6 +105,8 @@ definitions:
       id:
         type: string
       name:
+        type: string
+      tagId:
         type: string
     type: object
 host: 127.0.0.1:8081
@@ -104,14 +127,11 @@ paths:
         name: request_id
         required: true
         type: string
-      - in: query
-        name: email
-        required: true
-        type: string
-      - in: query
-        name: password
-        required: true
-        type: string
+      - description: 用户登录
+        in: body
+        name: object
+        schema:
+          $ref: '#/definitions/domain.LoginRequest'
       produces:
       - application/json
       responses:
@@ -149,7 +169,7 @@ paths:
       tags:
       - 文章相关接口
   /posts/create:
-    get:
+    post:
       consumes:
       - application/json
       description: 创建文章，返回文章Id
@@ -157,6 +177,11 @@ paths:
       - description: Request ID
         in: header
         name: request_id
+        required: true
+        type: string
+      - description: JWT
+        in: header
+        name: Authorization
         required: true
         type: string
       - description: 创建文章的参数
@@ -175,6 +200,37 @@ paths:
       security:
       - Authorization: []
       summary: 创建文章
+      tags:
+      - 文章相关接口
+  /posts/upload:
+    post:
+      consumes:
+      - multipart/form-data
+      description: 从文件上传创建文章，返回文章Id
+      parameters:
+      - description: Request ID
+        in: header
+        name: request_id
+        required: true
+        type: string
+      - description: JWT
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: 需要上传的markdown文件
+        in: formData
+        name: mdFile
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.CreatePostResponse'
+      summary: 从文件上传创建文章
       tags:
       - 文章相关接口
   /signup:
@@ -210,4 +266,114 @@ paths:
       summary: 注册用户
       tags:
       - 用户相关接口
+  /tag/create:
+    post:
+      consumes:
+      - application/json
+      description: 创建Tag，返回Tag
+      parameters:
+      - description: Request ID
+        in: header
+        name: request_id
+        required: true
+        type: string
+      - description: JWT
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: tagName
+        in: body
+        name: post
+        required: true
+        schema:
+          $ref: '#/definitions/domain.CreateTagRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Tag
+          schema:
+            $ref: '#/definitions/domain.Tag'
+      summary: 创建Tag
+      tags:
+      - Tag相关接口
+  /tag/list:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: Request ID
+        in: header
+        name: request_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Tag
+          schema:
+            $ref: '#/definitions/domain.ListTagsResponse'
+      summary: 获取所有tag
+      tags:
+      - Tag相关接口
+  /tag/search:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: Request ID
+        in: header
+        name: request_id
+        required: true
+        type: string
+      - description: JWT
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: id
+        in: query
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses: {}
+      summary: 根据Id 删除tag
+      tags:
+      - Tag相关接口
+  /tag/update:
+    post:
+      consumes:
+      - application/json
+      description: 创建Tag，返回Tag
+      parameters:
+      - description: Request ID
+        in: header
+        name: request_id
+        required: true
+        type: string
+      - description: JWT
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: tag
+        in: body
+        name: post
+        required: true
+        schema:
+          $ref: '#/definitions/domain.Tag'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Tag
+          schema:
+            $ref: '#/definitions/domain.Tag'
+      summary: 更新Tag
+      tags:
+      - Tag相关接口
 swagger: "2.0"

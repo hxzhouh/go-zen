@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/hxzhouh/go-zen.git/domain"
 	"github.com/hxzhouh/go-zen.git/internal/markdown"
+	"github.com/hxzhouh/go-zen.git/utils"
 	"time"
 )
 
@@ -32,19 +33,25 @@ func (p postUsecase) SearchByKeyword(keyword string, offset, limit int) ([]domai
 	return p.postRepository.Search(keyword, offset, limit)
 }
 
-func (p postUsecase) CreatePost(authorID string, postReq *domain.CreatePostRequest) error {
+func (p postUsecase) CreatePost(authorID string, postReq *domain.CreatePostRequest) (string, error) {
 	post := &domain.Post{
 		Title:       postReq.Title,
+		PostId:      utils.GenerateSnowflakeID().Base58(),
 		SubTitle:    postReq.SubTitle,
 		Summary:     postReq.Summary,
 		Cover:       postReq.Cover,
 		Content:     postReq.Content,
 		ContentHtml: string(markdown.MdToHTML([]byte(postReq.Content))),
-		Tags:        postReq.Tags,
 		Md5:         calcPostMd5(postReq),
 		AuthorID:    authorID,
+		TagIds:      postReq.TagIds,
+		CategoryId:  postReq.CategoryId,
 	}
-	return p.postRepository.Create(post)
+	err := p.postRepository.Create(post)
+	if err != nil {
+		return "", err
+	}
+	return post.PostId, nil
 }
 
 func calcPostMd5(post *domain.CreatePostRequest) string {

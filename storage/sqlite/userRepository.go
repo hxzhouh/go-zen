@@ -31,6 +31,12 @@ func (u UserRepository) GetByEmail(c context.Context, email string) (domain.User
 	return user, err
 }
 
+func (u UserRepository) GetByName(c context.Context, name string) (domain.User, error) {
+	var user domain.User
+	err := u.database.Where("name = ?", name).First(&user).Error
+	return user, err
+}
+
 func (u UserRepository) GetByID(c context.Context, id string) (domain.User, error) {
 	var user domain.User
 	err := u.database.Where("id = ?", id).First(&user).Error

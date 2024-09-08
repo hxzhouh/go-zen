@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"github.com/hxzhouh/go-zen.git/utils"
 	"log/slog"
 	"net/http"
 
@@ -54,6 +55,7 @@ func (sc *SignupController) Signup(c *gin.Context) {
 
 	user := domain.User{
 		Name:     request.Name,
+		UserId:   utils.GenerateSnowflakeID().Base32(),
 		Email:    request.Email,
 		Password: request.Password,
 	}

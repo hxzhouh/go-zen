@@ -55,7 +55,7 @@ func (suite *UserRepositoryTestSuite) TestFetch() {
 	user, err := suite.userRepository.GetByID(context.Background(), users[0].ID)
 	assert.NoError(suite.T(), err)
 	assert.Equal(suite.T(), user.ID, users[0].ID)
-	// get By Email
+	// get By User
 	user, err = suite.userRepository.GetByEmail(context.Background(), users[0].Email)
 	assert.NoError(suite.T(), err)
 	assert.Equal(suite.T(), user.Email, users[0].Email)

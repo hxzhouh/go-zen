@@ -37,16 +37,12 @@ const docTemplate = `{
                         "required": true
                     },
                     {
-                        "type": "string",
-                        "name": "email",
-                        "in": "query",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "name": "password",
-                        "in": "query",
-                        "required": true
+                        "description": "用户登录",
+                        "name": "object",
+                        "in": "body",
+                        "schema": {
+                            "$ref": "#/definitions/domain.LoginRequest"
+                        }
                     }
                 ],
                 "responses": {
@@ -99,7 +95,7 @@ const docTemplate = `{
             }
         },
         "/posts/create": {
-            "get": {
+            "post": {
                 "security": [
                     {
                         "Authorization": []
@@ -125,6 +121,13 @@ const docTemplate = `{
                         "required": true
                     },
                     {
+                        "type": "string",
+                        "description": "JWT",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
                         "description": "创建文章的参数",
                         "name": "post",
                         "in": "body",
@@ -132,6 +135,52 @@ const docTemplate = `{
                         "schema": {
                             "$ref": "#/definitions/domain.CreatePostRequest"
                         }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/domain.CreatePostResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/posts/upload": {
+            "post": {
+                "description": "从文件上传创建文章，返回文章Id",
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "文章相关接口"
+                ],
+                "summary": "从文件上传创建文章",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Request ID",
+                        "name": "request_id",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "JWT",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "file",
+                        "description": "需要上传的markdown文件",
+                        "name": "mdFile",
+                        "in": "formData",
+                        "required": true
                     }
                 ],
                 "responses": {
@@ -193,23 +242,174 @@ const docTemplate = `{
                     }
                 }
             }
-        }
-    },
-    "definitions": {
-        "domain.Category": {
-            "type": "object",
-            "properties": {
-                "id": {
-                    "type": "string"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "summary": {
-                    "type": "string"
+        },
+        "/tag/create": {
+            "post": {
+                "description": "创建Tag，返回Tag",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Tag相关接口"
+                ],
+                "summary": "创建Tag",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Request ID",
+                        "name": "request_id",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "JWT",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "tagName",
+                        "name": "post",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/domain.CreateTagRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Tag",
+                        "schema": {
+                            "$ref": "#/definitions/domain.Tag"
+                        }
+                    }
                 }
             }
         },
+        "/tag/list": {
+            "get": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Tag相关接口"
+                ],
+                "summary": "获取所有tag",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Request ID",
+                        "name": "request_id",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Tag",
+                        "schema": {
+                            "$ref": "#/definitions/domain.ListTagsResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/tag/search": {
+            "get": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Tag相关接口"
+                ],
+                "summary": "根据Id 删除tag",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Request ID",
+                        "name": "request_id",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "JWT",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "id",
+                        "name": "id",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/tag/update": {
+            "post": {
+                "description": "创建Tag，返回Tag",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Tag相关接口"
+                ],
+                "summary": "更新Tag",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Request ID",
+                        "name": "request_id",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "JWT",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "tag",
+                        "name": "post",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/domain.Tag"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Tag",
+                        "schema": {
+                            "$ref": "#/definitions/domain.Tag"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
         "domain.CreatePostRequest": {
             "type": "object",
             "required": [
@@ -217,8 +417,11 @@ const docTemplate = `{
                 "title"
             ],
             "properties": {
-                "category": {
-                    "$ref": "#/definitions/domain.Category"
+                "category_ids": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
                 },
                 "content": {
                     "type": "string"
@@ -232,10 +435,10 @@ const docTemplate = `{
                 "summary": {
                     "type": "string"
                 },
-                "tag": {
+                "tag_ids": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/domain.Tag"
+                        "type": "string"
                     }
                 },
                 "title": {
@@ -247,6 +450,43 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "id": {
+                    "type": "string"
+                }
+            }
+        },
+        "domain.CreateTagRequest": {
+            "type": "object",
+            "required": [
+                "name"
+            ],
+            "properties": {
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "domain.ListTagsResponse": {
+            "type": "object",
+            "properties": {
+                "tags": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/domain.Tag"
+                    }
+                }
+            }
+        },
+        "domain.LoginRequest": {
+            "type": "object",
+            "required": [
+                "password",
+                "user"
+            ],
+            "properties": {
+                "password": {
+                    "type": "string"
+                },
+                "user": {
                     "type": "string"
                 }
             }
@@ -268,8 +508,11 @@ const docTemplate = `{
                 "authorID": {
                     "type": "string"
                 },
-                "category": {
-                    "$ref": "#/definitions/domain.Category"
+                "category_id": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
                 },
                 "content": {
                     "type": "string"
@@ -289,16 +532,19 @@ const docTemplate = `{
                 "md5": {
                     "type": "string"
                 },
+                "postId": {
+                    "type": "string"
+                },
                 "subTitle": {
                     "type": "string"
                 },
                 "summary": {
                     "type": "string"
                 },
-                "tags": {
+                "tag_ids": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/domain.Tag"
+                        "type": "string"
                     }
                 },
                 "title": {
@@ -324,6 +570,9 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "name": {
+                    "type": "string"
+                },
+                "tagId": {
                     "type": "string"
                 }
             }

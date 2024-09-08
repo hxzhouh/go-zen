@@ -31,7 +31,7 @@ func (u PostRepository) Fetch(offset, limit int) ([]domain.Post, error) {
 
 func (u PostRepository) GetByID(id string) (domain.Post, error) {
 	var post domain.Post
-	err := u.database.Where("id = ?", id).First(&post).Error
+	err := u.database.Where("post_id = ?", id).First(&post).Error
 	return post, err
 }
 
@@ -40,7 +40,7 @@ func (u PostRepository) Update(post *domain.Post) error {
 }
 
 func (u PostRepository) DeleteByID(id string) error {
-	return u.database.Where("id = ?", id).Delete(&domain.Post{}).Error
+	return u.database.Where("post_id = ?", id).Delete(&domain.Post{}).Error
 
 }
 

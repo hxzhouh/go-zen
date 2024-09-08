@@ -1,31 +1,60 @@
 package domain
 
+import (
+	"database/sql/driver"
+	"encoding/json"
+	"gorm.io/gorm"
+)
+
 type CreatePostRequest struct {
-	Title    string   `json:"title" binding:"required"`
-	SubTitle string   `json:"subTitle"`
-	Summary  string   `json:"summary"`
-	Cover    string   `json:"cover"`
-	Content  string   `json:"content" binding:"required"`
-	Tags     []Tag    `json:"tag"`
-	Category Category `json:"category"`
+	Title      string   `json:"title" binding:"required"`
+	SubTitle   string   `json:"subTitle"`
+	Summary    string   `json:"summary"`
+	Cover      string   `json:"cover"`
+	Content    string   `json:"content" binding:"required"`
+	TagIds     []string `json:"tag_ids"`
+	CategoryId []string `json:"category_ids"`
 }
 type CreatePostResponse struct {
 	ID string `json:"id"`
 }
+type TagList []string
+type CategoryList []string
+
+func (p TagList) Value() (driver.Value, error) {
+	return json.Marshal(p)
+}
+
+// Scan 实现方法
+func (p *TagList) Scan(data interface{}) error {
+	return json.Unmarshal(data.([]byte), &p)
+}
+
+func (p CategoryList) Value() (driver.Value, error) {
+	return json.Marshal(p)
+}
+
+// Scan 实现方法
+func (p *CategoryList) Scan(data interface{}) error {
+	return json.Unmarshal(data.([]byte), &p)
+}
 
 type Post struct {
-	ID          string   `gorm:"primaryKey;autoIncrement"`
-	Title       string   `gorm:"type:varchar(255)"`
-	SubTitle    string   `gorm:"type:varchar(255)"`
-	Summary     string   `gorm:"type:varchar(255)"`
-	Draft       bool     `gorm:"type:boolean"`
-	Cover       string   `gorm:"type:varchar(255)"`
-	Content     string   `gorm:"type:text"`
-	ContentHtml string   `gorm:"type:text"`
-	AuthorID    string   `gorm:"type:varchar(255)"`
-	Md5         string   `gorm:"type:varchar(64)"`
-	Tags        []Tag    `gorm:"many2many:post_tags;"`
-	Category    Category `gorm:"foreignKey:ID;references:CategoryID"`
+	gorm.Model
+	PostId      string       `gorm:"unique"`
+	Title       string       `gorm:"type:varchar(255)"`
+	SubTitle    string       `gorm:"type:varchar(255)"`
+	Summary     string       `gorm:"type:varchar(255)"`
+	Draft       bool         `gorm:"type:boolean"`
+	Cover       string       `gorm:"type:varchar(255)"`
+	Content     string       `gorm:"type:text"`
+	ContentHtml string       `gorm:"type:text"`
+	AuthorID    string       `gorm:"type:varchar(255)"`
+	Md5         string       `gorm:"type:varchar(64)"`
+	TagIds      TagList      `json:"tag_ids"`
+	CategoryId  CategoryList `json:"category_id"`
+	Reads       int          `gorm:"type:int"`
+	Likes       int          `gorm:"type:int"`
 }
 
 type PostRepository interface {
@@ -40,7 +69,7 @@ type PostRepository interface {
 }
 
 type PostUsecase interface {
-	CreatePost(authorID string, post *CreatePostRequest) error
+	CreatePost(authorID string, post *CreatePostRequest) (string, error)
 	List(offset, limit int) ([]Post, error)
 	GetByID(id string) (Post, error)
 	SearchByKeyword(keyword string, offset, limit int) ([]Post, error)

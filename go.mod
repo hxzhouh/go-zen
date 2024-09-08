@@ -3,6 +3,7 @@ module github.com/hxzhouh/go-zen.git
 go 1.23
 
 require (
+	github.com/bwmarrin/snowflake v0.3.0
 	github.com/gin-gonic/gin v1.10.0
 	github.com/golang-jwt/jwt/v4 v4.5.0
 	github.com/gomarkdown/markdown v0.0.0-20240730141124-034f12af3bf6

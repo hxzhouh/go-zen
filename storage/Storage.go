@@ -25,13 +25,5 @@ func InitStorage(dataType string, dsn string) error {
 }
 
 func migration() error {
-	err := DefaultStorage.AutoMigrate(&domain.User{})
-	if err != nil {
-		return err
-	}
-	err = DefaultStorage.AutoMigrate(&domain.Post{})
-	if err != nil {
-		return err
-	}
-	return nil
+	return DefaultStorage.AutoMigrate(&domain.User{}, &domain.Post{}, &domain.Tag{}, &domain.Category{})
 }

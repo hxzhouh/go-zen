@@ -6,6 +6,7 @@ import (
 	"github.com/hxzhouh/go-zen.git/domain"
 	"golang.org/x/crypto/bcrypt"
 	"net/http"
+	"regexp"
 )
 
 type LoginController struct {
@@ -20,7 +21,7 @@ type LoginController struct {
 // @Param request_id header string true "Request ID"
 // @Accept application/json
 // @Produce application/json
-// @Param object query domain.LoginRequest false "用户登录"
+// @Param object body domain.LoginRequest false "用户登录"
 // @Success 200 {object} domain.LoginResponse
 // @Router /login [post]
 func (lc *LoginController) Login(c *gin.Context) {
@@ -31,11 +32,19 @@ func (lc *LoginController) Login(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, domain.ErrorResponse{Message: err.Error()})
 		return
 	}
-
-	user, err := lc.LoginUsecase.GetUserByEmail(c, request.Email)
-	if err != nil {
-		c.JSON(http.StatusNotFound, domain.ErrorResponse{Message: "User not found with the given email"})
-		return
+	user := domain.User{}
+	if !isEmail(request.User) {
+		user, err = lc.LoginUsecase.GetUserByEmail(c, request.User)
+		if err != nil {
+			c.JSON(http.StatusNotFound, domain.ErrorResponse{Message: "User not found with the given email"})
+			return
+		}
+	} else {
+		user, err = lc.LoginUsecase.GetUserByEmail(c, request.User)
+		if err != nil {
+			c.JSON(http.StatusNotFound, domain.ErrorResponse{Message: "User not found with the given username"})
+			return
+		}
 	}
 
 	if bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(request.Password)) != nil {
@@ -61,4 +70,11 @@ func (lc *LoginController) Login(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, loginResponse)
+}
+
+func isEmail(email string) bool {
+	// Define a regular expression for validating an email address.
+	const emailRegex = `^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$`
+	re := regexp.MustCompile(emailRegex)
+	return re.MatchString(email)
 }
