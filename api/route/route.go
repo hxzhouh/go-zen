@@ -15,12 +15,13 @@ func Setup(env *bootstrap.Env, timeout time.Duration, gin *gin.Engine) {
 	privateRouter := gin.Group("")
 	privateRouter.Use(middleware.JwtAuthMiddleware(env.AccessTokenSecret), middleware.RequestLogMiddleware())
 
-	// All Public APIs
 	NewSignupRouter(env, timeout, storage.DefaultStorage, publicRouter)
 	NewLoginRouter(env, timeout, publicRouter)
 	NewIndexRoute(publicRouter)
-	NewSwaggerRouter(publicRouter)
 	NewPostRouter(env, timeout, publicRouter, privateRouter)
 	NewTagRouter(timeout, publicRouter, privateRouter)
 
+	if env.AppEnv == "development" {
+		NewSwaggerRouter(publicRouter)
+	}
 }

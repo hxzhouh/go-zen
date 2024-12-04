@@ -3,10 +3,10 @@ package usecase
 import (
 	"crypto/md5"
 	"fmt"
-	"github.com/hxzhouh/go-zen.git/domain"
-	"github.com/hxzhouh/go-zen.git/internal/markdown"
-	"github.com/hxzhouh/go-zen.git/utils"
 	"time"
+
+	"github.com/hxzhouh/go-zen.git/domain"
+	"github.com/hxzhouh/go-zen.git/utils"
 )
 
 type postUsecase struct {
@@ -41,7 +41,7 @@ func (p postUsecase) CreatePost(authorID string, postReq *domain.CreatePostReque
 		Summary:     postReq.Summary,
 		Cover:       postReq.Cover,
 		Content:     postReq.Content,
-		ContentHtml: string(markdown.MdToHTML([]byte(postReq.Content))),
+		ContentHtml: "",
 		Md5:         calcPostMd5(postReq),
 		AuthorID:    authorID,
 		TagIds:      postReq.TagIds,

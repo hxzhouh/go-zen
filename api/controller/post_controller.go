@@ -1,12 +1,13 @@
 package controller
 
 import (
-	"github.com/gin-gonic/gin"
-	"github.com/hxzhouh/go-zen.git/bootstrap"
-	"github.com/hxzhouh/go-zen.git/domain"
 	"io"
 	"log/slog"
 	"net/http"
+
+	"github.com/gin-gonic/gin"
+	"github.com/hxzhouh/go-zen.git/bootstrap"
+	"github.com/hxzhouh/go-zen.git/domain"
 )
 
 type PostController struct {
@@ -24,10 +25,18 @@ type PostController struct {
 // @Accept application/json
 // @Produce application/json
 // @Param id path string true "文章id"
-// @Success 200 {object} domain.Post
+// @Success 200 {object} []domain.Post
 // @Router /posts/:id [get]
 func (pc *PostController) List(c *gin.Context) {
-
+	posts, err := pc.PostUsecase.List(0, 10)
+	if err != nil {
+		slog.Error("List error", "error", err.Error())
+		c.JSON(http.StatusInternalServerError, domain.ErrorResponse{Message: err.Error()})
+		return
+	}
+	c.HTML(http.StatusOK, "posts_list.html", gin.H{
+		"Posts": posts,
+	})
 }
 
 // GetPostById 获取文章

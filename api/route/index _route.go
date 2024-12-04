@@ -1,8 +1,9 @@
 package route
 
 import (
-	"github.com/gin-gonic/gin"
 	"net/http"
+
+	"github.com/gin-gonic/gin"
 )
 
 func NewIndexRoute(group *gin.RouterGroup) {
@@ -13,9 +14,4 @@ func NewIndexRoute(group *gin.RouterGroup) {
 			"content": "You reached the album management site...",
 		})
 	})
-	//group.GET("/home", func(c *gin.Context) {
-	//	c.HTML(http.StatusOK, "home.html", gin.H{
-	//		"content": "You reached the album management site...",
-	//	})
-	//})
 }

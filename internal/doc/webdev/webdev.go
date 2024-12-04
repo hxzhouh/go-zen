@@ -9,7 +9,22 @@ import (
 	"github.com/studio-b12/gowebdav"
 )
 
-func main() {
+type WebDav struct {
+	ServerUrl string
+	UserName  string
+	PassWord  string
+	FilePath  string
+}
+
+func InitWebDav(url, userName, passWord, FilePath string) *WebDav {
+	return &WebDav{
+		ServerUrl: url,
+		UserName:  userName,
+		PassWord:  passWord,
+		FilePath:  FilePath,
+	}
+}
+func (*WebDav) SyncFile() error {
 	// WebDAV 服务器地址和凭据
 	serverURL := "https://example.com/webdav/"
 	username := "your_username"
@@ -22,7 +37,7 @@ func main() {
 	err := client.Connect()
 	if err != nil {
 		fmt.Println("Failed to connect to WebDAV server:", err)
-		return
+		return err
 	}
 	fmt.Println("Connected to WebDAV server")
 
@@ -38,6 +53,7 @@ func main() {
 			fmt.Println("File pulled successfully")
 		}
 	}
+	return err
 }
 
 // pullFile 从 WebDAV 服务器下载文件到本地

@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	"html/template"
 	"log"
 	"log/slog"
 	"os"
@@ -12,6 +13,9 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/hxzhouh/go-zen.git/api/route"
 	"github.com/hxzhouh/go-zen.git/bootstrap"
+	"github.com/hxzhouh/go-zen.git/internal/PostFile"
+	"github.com/hxzhouh/go-zen.git/storage"
+	"github.com/hxzhouh/go-zen.git/storage/sqlite"
 	_ "github.com/hxzhouh/go-zen.git/utils"
 )
 
@@ -39,8 +43,16 @@ func main() {
 	env := app.Env
 	timeout := time.Duration(env.ContextTimeout) * time.Second
 	ginServer := gin.Default()
+	// 设置模板函数映射
+	ginServer.SetFuncMap(template.FuncMap{
+		"safeHTML": func(s string) template.HTML {
+			return template.HTML(s)
+		},
+	})
+
 	ginServer.Static("/assets", "./assets")
 	ginServer.StaticFile("/favicon.ico", "./assets/icons-8-favicon-16.png")
+
 	ginServer.LoadHTMLGlob("templates/*.html")
 	route.Setup(env, timeout, ginServer)
 	go func() {
@@ -50,12 +62,18 @@ func main() {
 			return
 		}
 	}()
+	pr := sqlite.NewPostRepository(storage.DefaultStorage)
+	posts := PostFile.ReadAllFile("./post")
+	for _, post := range posts {
+		pr.Create(post.ToPost())
+	}
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, syscall.SIGHUP, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT)
 
 	for i := range c {
 		slog.Info("receive exit signal ", i.String(), ",exit...")
 		app.Close()
+		os.Remove("./go_zen.db") //todo remove db file, test only
 		os.Exit(0)
 	}
 }

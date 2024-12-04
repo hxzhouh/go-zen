@@ -47,11 +47,13 @@ func (c TagController) Update(context *gin.Context) {
 // @Produce application/json
 // @Param post body domain.CreateTagRequest true "tagName"
 // @Success 200 {object} domain.Tag "Tag"
+// @Failure 400 {object} domain.ErrorResponse "Bad Request"
+// @Failure 500 {object} domain.ErrorResponse "Internal Server Error"
 // @Router /tag/create [post]
 func (c TagController) Create(context *gin.Context) {
 	value := domain.CreateTagRequest{}
 	if err := context.ShouldBindJSON(&value); err != nil {
-		context.JSON(400, gin.H{"error": err.Error()})
+		context.JSON(400, domain.ErrorResponse{Message: err.Error()})
 		return
 	}
 	tag := domain.Tag{
@@ -60,7 +62,7 @@ func (c TagController) Create(context *gin.Context) {
 	}
 	err := c.TagUsecase.CreateTag(&tag)
 	if err != nil {
-		context.JSON(500, gin.H{"error": err.Error()})
+		context.JSON(500, domain.ErrorResponse{Message: err.Error()})
 		return
 	}
 	context.JSON(200, tag)
@@ -74,12 +76,13 @@ func (c TagController) Create(context *gin.Context) {
 // @Accept application/json
 // @Produce application/json
 // @Success 200 {object} domain.ListTagsResponse "Tag"
+// @Failure 500 {object} domain.ErrorResponse "Internal Server Error"
 // @Router /tag/list [get]
 func (c TagController) List(context *gin.Context) {
 	var tags []domain.Tag
 	tags, err := c.TagUsecase.List()
 	if err != nil {
-		context.JSON(500, gin.H{"error": err.Error()})
+		context.JSON(500, domain.ErrorResponse{Message: err.Error()})
 		return
 	}
 	resp := domain.ListTagsResponse{

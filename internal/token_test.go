@@ -8,8 +8,8 @@ import (
 
 func TestCreateAccessToken(t *testing.T) {
 	user := &domain.User{
-		ID:   "123",
-		Name: "testuser",
+		UserId: "123",
+		Name:   "testuser",
 	}
 	secret := "mysecret"
 	expiry := 1 // 1 hour
@@ -20,8 +20,8 @@ func TestCreateAccessToken(t *testing.T) {
 
 func TestIsAuthorized(t *testing.T) {
 	user := &domain.User{
-		ID:   "123",
-		Name: "testuser",
+		UserId: "123",
+		Name:   "testuser",
 	}
 	secret := "mysecret"
 	expiry := 1 // 1 hour

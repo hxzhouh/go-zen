@@ -1,0 +1,11 @@
+{{range .Posts}}
+<div class="post mb-5">
+    <h4 class="fw-bold">{{.Title}}</h4>
+    {{if .SubTitle}}
+    <h4 class="text-muted">{{.SubTitle}}</h4>
+    {{end}}
+    <div class="content mt-3">
+        {{.Summary | safeHTML}}
+    </div>
+</div>
+{{end}}

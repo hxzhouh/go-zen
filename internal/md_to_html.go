@@ -1,10 +1,9 @@
-package markdown
+package internal
 
 import (
 	"github.com/gomarkdown/markdown"
 	"github.com/gomarkdown/markdown/html"
 	"github.com/gomarkdown/markdown/parser"
-	//"github.com/yuin/goldmark/renderer/html"
 )
 
 func MdToHTML(md []byte) []byte {
