@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <title>文章列表</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
-
     <script src="https://unpkg.com/htmx.org@1.9.2"></script>
     <style>
         body {
@@ -13,14 +12,69 @@
     </style>
 </head>
 <body>
-    <header>
-        <!-- 头部内容 -->
-    </header>
-    <main class="container my-5">
-        <div id="articles" hx-get="/posts/list" hx-trigger="load"></div>
-    </main>
-    <footer>
-        <!-- 底部内容 -->
-    </footer>
+<header>
+</header>
+<main class="container my-5">
+    <!-- 文章列表容器 -->
+    <div id="articles" hx-get="/posts/list?limit=10&offset=0" hx-trigger="load"></div>
+
+    <!-- 分页导航 -->
+    <nav aria-label="Page navigation" class="mt-4">
+        <ul class="pagination">
+            <li class="page-item" id="prev-page" style="display: none;">
+                <a class="page-link"
+                   href="#"
+                   hx-get="/posts/list"
+                   hx-vals='{"limit": 10, "offset": 0}'
+                   hx-target="#articles"
+                   hx-trigger="click">
+                    上一页
+                </a>
+            </li>
+            <li class="page-item" id="next-page" style="display: none;">
+                <a class="page-link"
+                   href="#"
+                   hx-get="/posts/list"
+                   hx-vals='{"limit": 10, "offset": 10}'
+                   hx-target="#articles"
+                   hx-trigger="click">
+                    下一页
+                </a>
+            </li>
+        </ul>
+    </nav>
+</main>
+<footer>
+</footer>
+<script>
+    // 动态更新分页按钮状态
+    document.body.addEventListener('htmx:afterRequest', function (event) {
+        const response = event.detail.xhr.responseText;
+
+        // 解析返回的 HTML
+        const parser = new DOMParser();
+        const htmlDoc = parser.parseFromString(response, "text/html");
+
+        // 检查分页状态
+        const hasPrev = htmlDoc.querySelector("#has-prev")?.textContent === "true";
+        const hasNext = htmlDoc.querySelector("#has-next")?.textContent === "true";
+
+        // 更新按钮显示状态
+        document.getElementById("prev-page").style.display = hasPrev ? "block" : "none";
+        document.getElementById("next-page").style.display = hasNext ? "block" : "none";
+
+        // 更新分页按钮偏移值
+        const prevOffset = htmlDoc.querySelector("#prev-offset")?.textContent || "0";
+        const nextOffset = htmlDoc.querySelector("#next-offset")?.textContent || "10";
+
+        document.querySelector("#prev-page a").setAttribute("hx-vals", JSON.stringify({ limit: 10, offset: prevOffset }));
+        document.querySelector("#next-page a").setAttribute("hx-vals", JSON.stringify({ limit: 10, offset: nextOffset }));
+    });
+
+    // 为每个 HTMX 请求添加唯一 RequestId
+    document.body.addEventListener('htmx:configRequest', function (event) {
+        event.detail.headers['request_id'] = 'req_' + Math.random().toString(16).slice(2);
+    });
+</script>
 </body>
 </html>

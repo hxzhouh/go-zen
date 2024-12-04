@@ -2,12 +2,13 @@ package sqlite
 
 import (
 	"context"
+	"testing"
+
 	"github.com/hxzhouh/go-zen.git/domain"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
-	"testing"
 )
 
 type UserRepositoryTestSuite struct {

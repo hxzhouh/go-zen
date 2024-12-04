@@ -4,6 +4,7 @@ import (
 	"io"
 	"log/slog"
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"github.com/hxzhouh/go-zen.git/bootstrap"
@@ -28,14 +29,42 @@ type PostController struct {
 // @Success 200 {object} []domain.Post
 // @Router /posts/:id [get]
 func (pc *PostController) List(c *gin.Context) {
-	posts, err := pc.PostUsecase.List(0, 10)
+	limitStr := c.DefaultQuery("limit", "10")
+	offsetStr := c.DefaultQuery("offset", "0")
+
+	// 转换为整数类型
+	offset, _ := strconv.Atoi(offsetStr)
+	limit, _ := strconv.Atoi(limitStr)
+	if limit <= 0 {
+		limit = 10
+	}
+	if offset < 0 {
+		offset = 0
+	}
+	prevOffset := offset - limit
+	if prevOffset < 0 {
+		prevOffset = 0 // 确保不为负数
+	}
+	nextOffset := offset + limit
+	posts, err := pc.PostUsecase.List(offset, limit)
 	if err != nil {
 		slog.Error("List error", "error", err.Error())
 		c.JSON(http.StatusInternalServerError, domain.ErrorResponse{Message: err.Error()})
 		return
 	}
+	// 判断是否有上一页
+	hasPrev := offset > 0
+
+	// 判断是否有下一页（需要知道总的文章数 totalCount）
+	hasNext := offset+limit < 123
 	c.HTML(http.StatusOK, "posts_list.html", gin.H{
-		"Posts": posts,
+		"Posts":      posts,
+		"Limit":      limit,
+		"Offset":     offset,
+		"PrevOffset": prevOffset,
+		"NextOffset": nextOffset,
+		"HasPrev":    hasPrev,
+		"HasNext":    hasNext,
 	})
 }
 
@@ -63,7 +92,9 @@ func (pc *PostController) GetPostById(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, domain.ErrorResponse{Message: err.Error()})
 		return
 	}
-	c.JSON(http.StatusOK, post)
+	c.HTML(http.StatusOK, "post_detail.html", gin.H{
+		"Post": post,
+	})
 }
 
 // Create 创建文章

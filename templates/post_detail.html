@@ -1,0 +1,9 @@
+<div class="post">
+    <h1>{{.Title}}</h1>
+    {{if .SubTitle}}
+    <h3 class="text-muted">{{.SubTitle}}</h3>
+    {{end}}
+    <div class="content mt-3">
+        {{.ContentHtml | safeHTML}}
+    </div>
+</div>

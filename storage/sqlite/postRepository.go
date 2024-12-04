@@ -25,7 +25,7 @@ func (u PostRepository) Create(post *domain.Post) error {
 
 func (u PostRepository) Fetch(offset, limit int) ([]domain.Post, error) {
 	var posts []domain.Post
-	err := u.database.Find(&posts).Error
+	err := u.database.Limit(limit).Offset(offset).Find(&posts).Error
 	return posts, err
 }
 

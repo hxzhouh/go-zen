@@ -13,9 +13,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/hxzhouh/go-zen.git/api/route"
 	"github.com/hxzhouh/go-zen.git/bootstrap"
-	"github.com/hxzhouh/go-zen.git/internal/PostFile"
-	"github.com/hxzhouh/go-zen.git/storage"
-	"github.com/hxzhouh/go-zen.git/storage/sqlite"
 	_ "github.com/hxzhouh/go-zen.git/utils"
 )
 
@@ -48,6 +45,8 @@ func main() {
 		"safeHTML": func(s string) template.HTML {
 			return template.HTML(s)
 		},
+		"sub": func(a, b int) int { return a - b },
+		"add": func(a, b int) int { return a + b },
 	})
 
 	ginServer.Static("/assets", "./assets")
@@ -62,18 +61,18 @@ func main() {
 			return
 		}
 	}()
-	pr := sqlite.NewPostRepository(storage.DefaultStorage)
-	posts := PostFile.ReadAllFile("./post")
-	for _, post := range posts {
-		pr.Create(post.ToPost())
-	}
+	//pr := sqlite.NewPostRepository(storage.DefaultStorage)
+	//posts := PostFile.ReadAllFile("./post")
+	//for _, post := range posts {
+	//	pr.Create(post.ToPost())
+	//}
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, syscall.SIGHUP, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT)
 
 	for i := range c {
 		slog.Info("receive exit signal ", i.String(), ",exit...")
 		app.Close()
-		os.Remove("./go_zen.db") //todo remove db file, test only
+		//os.Remove("./go_zen.db") //todo remove db file, test only
 		os.Exit(0)
 	}
 }
