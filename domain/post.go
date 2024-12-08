@@ -3,6 +3,7 @@ package domain
 import (
 	"database/sql/driver"
 	"encoding/json"
+	"html/template"
 
 	"gorm.io/gorm"
 )
@@ -42,20 +43,20 @@ func (p *CategoryList) Scan(data interface{}) error {
 
 type Post struct {
 	gorm.Model
-	PostId      string       `gorm:"unique"`
-	Title       string       `gorm:"type:varchar(255)"`
-	SubTitle    string       `gorm:"type:varchar(255)"`
-	Summary     string       `gorm:"type:varchar(255)"`
-	Draft       bool         `gorm:"type:boolean"`
-	Cover       string       `gorm:"type:varchar(255)"`
-	Content     string       `gorm:"type:text"`
-	ContentHtml string       `gorm:"type:text"`
-	AuthorID    string       `gorm:"type:varchar(255)"`
-	Md5         string       `gorm:"type:varchar(64)"`
-	TagIds      TagList      `json:"tag_ids"`
-	CategoryId  CategoryList `json:"category_id"`
-	Reads       int          `gorm:"type:int"`
-	Likes       int          `gorm:"type:int"`
+	PostId      string        `gorm:"unique"`
+	Title       string        `gorm:"type:varchar(255)"`
+	SubTitle    string        `gorm:"type:varchar(255)"`
+	Summary     string        `gorm:"type:varchar(255)"`
+	Draft       bool          `gorm:"type:boolean"`
+	Cover       string        `gorm:"type:varchar(255)"`
+	Content     string        `gorm:"type:text"`
+	ContentHtml template.HTML `gorm:"type:text"`
+	AuthorID    string        `gorm:"type:varchar(255)"`
+	Md5         string        `gorm:"type:varchar(64)"`
+	TagIds      TagList       `json:"tag_ids"`
+	CategoryId  CategoryList  `json:"category_id"`
+	Reads       int           `gorm:"type:int"`
+	Likes       int           `gorm:"type:int"`
 }
 
 type PostRepository interface {

@@ -1,6 +1,8 @@
 {{range .Posts}}
 <div class="post mb-5">
-    <h4 class="fw-bold">{{.Title}}</h4>
+    <h4 class="fw-bold">
+        <a href="/posts/{{.PostId}}" class="text-decoration-none">{{.Title}}</a>
+    </h4>
     {{if .SubTitle}}
     <h4 class="text-muted">{{.SubTitle}}</h4>
     {{end}}

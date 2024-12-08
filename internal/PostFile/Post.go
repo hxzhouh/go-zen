@@ -51,7 +51,7 @@ func (p *Post) ToPost() *domain.Post {
 		AuthorID:    p.Properties.Author,
 		Md5:         "",
 		PostId:      p.Properties.Id,
-		ContentHtml: string(internal.MdToHTML([]byte(p.Content))),
+		ContentHtml: internal.MdToHTML([]byte(p.Content)),
 		Reads:       0,
 		Likes:       0,
 	}

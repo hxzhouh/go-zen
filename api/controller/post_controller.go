@@ -9,6 +9,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/hxzhouh/go-zen.git/bootstrap"
 	"github.com/hxzhouh/go-zen.git/domain"
+	"github.com/hxzhouh/go-zen.git/internal"
 )
 
 type PostController struct {
@@ -92,6 +93,7 @@ func (pc *PostController) GetPostById(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, domain.ErrorResponse{Message: err.Error()})
 		return
 	}
+	post.ContentHtml = internal.MdToHTML([]byte(post.Content))
 	c.HTML(http.StatusOK, "post_detail.html", gin.H{
 		"Post": post,
 	})

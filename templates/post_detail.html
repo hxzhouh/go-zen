@@ -1,9 +1,39 @@
-<div class="post">
-    <h1>{{.Title}}</h1>
-    {{if .SubTitle}}
-    <h3 class="text-muted">{{.SubTitle}}</h3>
-    {{end}}
-    <div class="content mt-3">
-        {{.ContentHtml | safeHTML}}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ .Post.Title }}</title>
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/5.2.0/github-markdown.min.css">
+    <style>
+    .markdown-body {
+        box-sizing: border-box;
+        min-width: 200px;
+        max-width: 980px;
+        margin: 0 auto;
+        padding: 45px;
+    }
+
+    @media (max-width: 767px) {
+        .markdown-body {
+            padding: 15px;
+        }
+    }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>{{ .Post.Title }}</h1>
+        <div class="subtitle">{{ .Post.SubTitle }}</div>
+        
+        <!-- 文章内容区域 -->
+        <div id="content-area" 
+             hx-get="/posts/{{ .Post.PostId }}" 
+             hx-trigger="load"
+             hx-target="#content-area"
+             class="markdown-body">
+            加载中...
+        </div>
     </div>
-</div>
+</body>
+</html>
+{{ end }}

@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/hxzhouh/go-zen.git/domain"
+	"github.com/hxzhouh/go-zen.git/internal"
 	"github.com/hxzhouh/go-zen.git/utils"
 )
 
@@ -26,7 +27,13 @@ func (p postUsecase) List(offset, limit int) ([]domain.Post, error) {
 }
 
 func (p postUsecase) GetByID(id string) (domain.Post, error) {
-	return p.postRepository.GetByID(id)
+	post, err := p.postRepository.GetByID(id)
+	if err != nil {
+		return domain.Post{}, err
+	}
+	// 将 Markdown 内容转换为 HTML
+	post.ContentHtml = internal.MdToHTML([]byte(post.Content))
+	return post, nil
 }
 
 func (p postUsecase) SearchByKeyword(keyword string, offset, limit int) ([]domain.Post, error) {

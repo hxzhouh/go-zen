@@ -47,12 +47,15 @@ func main() {
 		},
 		"sub": func(a, b int) int { return a - b },
 		"add": func(a, b int) int { return a + b },
+		"unescapeHTML": func(s string) template.HTML {
+			return template.HTML(s)
+		},
 	})
 
 	ginServer.Static("/assets", "./assets")
 	ginServer.StaticFile("/favicon.ico", "./assets/icons-8-favicon-16.png")
 
-	ginServer.LoadHTMLGlob("templates/*.html")
+	ginServer.LoadHTMLGlob("templates/*")
 	route.Setup(env, timeout, ginServer)
 	go func() {
 		err := ginServer.Run(env.ServerAddress)
@@ -61,18 +64,18 @@ func main() {
 			return
 		}
 	}()
-	//pr := sqlite.NewPostRepository(storage.DefaultStorage)
-	//posts := PostFile.ReadAllFile("./post")
-	//for _, post := range posts {
-	//	pr.Create(post.ToPost())
-	//}
+	// pr := sqlite.NewPostRepository(storage.DefaultStorage)
+	// posts := PostFile.ReadAllFile("./post")
+	// for _, post := range posts {
+	// 	pr.Create(post.ToPost())
+	// }
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, syscall.SIGHUP, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT)
 
 	for i := range c {
 		slog.Info("receive exit signal ", i.String(), ",exit...")
 		app.Close()
-		//os.Remove("./go_zen.db") //todo remove db file, test only
+		// os.Remove("./go_zen.db") //todo remove db file, test only
 		os.Exit(0)
 	}
 }

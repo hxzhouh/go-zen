@@ -50,23 +50,18 @@
     // 动态更新分页按钮状态
     document.body.addEventListener('htmx:afterRequest', function (event) {
         const response = event.detail.xhr.responseText;
-
         // 解析返回的 HTML
         const parser = new DOMParser();
         const htmlDoc = parser.parseFromString(response, "text/html");
-
         // 检查分页状态
         const hasPrev = htmlDoc.querySelector("#has-prev")?.textContent === "true";
         const hasNext = htmlDoc.querySelector("#has-next")?.textContent === "true";
-
         // 更新按钮显示状态
         document.getElementById("prev-page").style.display = hasPrev ? "block" : "none";
         document.getElementById("next-page").style.display = hasNext ? "block" : "none";
-
         // 更新分页按钮偏移值
         const prevOffset = htmlDoc.querySelector("#prev-offset")?.textContent || "0";
         const nextOffset = htmlDoc.querySelector("#next-offset")?.textContent || "10";
-
         document.querySelector("#prev-page a").setAttribute("hx-vals", JSON.stringify({ limit: 10, offset: prevOffset }));
         document.querySelector("#next-page a").setAttribute("hx-vals", JSON.stringify({ limit: 10, offset: nextOffset }));
     });
